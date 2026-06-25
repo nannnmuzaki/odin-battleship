@@ -2,7 +2,8 @@ import { Ship } from "../ship/Ship.js";
 
 export class Gameboard {
   #coordinates = new Map();
-  // #attackedCoordinates = new Map();
+  #attackedCoordinates = new Set();
+  #aliveShipCount = 0;
   static #allowedOrientation = ["HORIZONTAL", "VERTICAL"];
 
   placeShip(startX, startY, orientation, length) {
@@ -70,6 +71,46 @@ export class Gameboard {
           this.#coordinates.set(`${startX}${startY + i}`, ship);
         }
       }
+
+      this.#aliveShipCount++;
     }
+  }
+
+  receiveAttack(x, y) {
+    if (typeof x !== "string" || x.trim().length !== 1) {
+      throw new TypeError("x coordinate must be A - J");
+    }
+
+    const xCode = x.trim().toUpperCase().charCodeAt(0);
+
+    if (!(xCode >= 65 && xCode <= 74)) {
+      throw new RangeError("x coordinate muset be A - J");
+    }
+
+    if (!Number.isSafeInteger(y) || !(y >= 1 && y <= 10)) {
+      throw new RangeError("y coordinate must be an integer 1 - 10");
+    }
+
+    if (this.#attackedCoordinates.has(`${x}${y}`)) {
+      throw new Error("this coordinate is already hit");
+    }
+
+    if (this.#coordinates.has(`${x}${y}`)) {
+      const ship = this.#coordinates.get(`${x}${y}`);
+      ship.hit();
+      this.#attackedCoordinates.add(`${x}${y}`);
+
+      if (ship.isSunk()) {
+        this.#aliveShipCount--;
+      }
+      return true;
+    }
+
+    this.#attackedCoordinates.add(`${x}${y}`);
+    return false;
+  }
+
+  areAllShipsSunk() {
+    return this.#aliveShipCount === 0;
   }
 }
