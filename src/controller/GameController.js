@@ -16,8 +16,14 @@ export class GameController {
     this.#boardOne = new Gameboard();
     this.#boardTwo = new Gameboard();
 
+    // For now both use random ship placement
+    this.initializeRandomBoard(this.#boardOne);
+    this.initializeRandomBoard(this.#boardTwo);
+
     // Player One always starts first, maybe will be random later
     this.#activePlayer = this.#playerOne;
+    // this.#activePlayer =
+    //   Math.floor(Math.round()) > 0 ? this.#playerOne : this.#playerTwo;
   }
 
   getActivePlayer() {
@@ -68,6 +74,36 @@ export class GameController {
       const y = parseInt(move.slice(1), 10);
 
       this.playRound(x, y);
+    }
+  }
+
+  initializeRandomBoard(board) {
+    if (!(board instanceof Gameboard)) {
+      throw new TypeError("board must be a type of Gameboard");
+    }
+
+    const shipLengths = [5, 4, 3, 3, 2];
+    const orientations = ["HORIZONTAL", "VERTICAL"];
+
+    for (const length of shipLengths) {
+      let placed = false;
+
+      while (!placed) {
+        const randomXCode = Math.floor(Math.random() * 10) + 65;
+        const x = String.fromCharCode(randomXCode);
+
+        const y = Math.floor(Math.random() * 10) + 1;
+
+        const orientation = orientations[Math.round(Math.random())];
+
+        try {
+          board.placeShip(x, y, orientation, length);
+          placed = true;
+        } catch {
+          // do nothing,
+          // since the error from brute forcing placement is not important
+        }
+      }
     }
   }
 }
