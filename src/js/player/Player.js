@@ -31,4 +31,8 @@ export class Player {
 
     return move;
   }
+
+  isPlayerComputer() {
+    return this.#type === "COMPUTER";
+  }
 }
