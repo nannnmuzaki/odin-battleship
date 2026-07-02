@@ -1,5 +1,5 @@
-import { Player } from "./Player.js";
-import { Gameboard } from "./Gameboard.js";
+import { Player } from "../player/Player.js";
+import { Gameboard } from "../gameboard/Gameboard.js";
 
 export class GameController {
   #playerOne;
@@ -26,7 +26,15 @@ export class GameController {
     //   Math.floor(Math.round()) > 0 ? this.#playerOne : this.#playerTwo;
   }
 
-  getActivePlayer() {
+  get boardOne() {
+    return this.#boardOne;
+  }
+
+  get boardTwo() {
+    return this.#boardTwo;
+  }
+
+  get ActivePlayer() {
     return this.#activePlayer;
   }
 
