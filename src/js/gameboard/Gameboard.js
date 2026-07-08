@@ -6,6 +6,14 @@ export class Gameboard {
   #aliveShipCount = 0;
   static #allowedOrientation = ["HORIZONTAL", "VERTICAL"];
 
+  get coordinates() {
+    return this.#coordinates;
+  }
+
+  get attackedCoordinates() {
+    return this.#attackedCoordinates;
+  }
+
   placeShip(startX, startY, orientation, length) {
     if (typeof startX !== "string" || startX.trim().length !== 1) {
       throw new TypeError("startX must be A - J");

@@ -17,8 +17,8 @@ export class GameController {
     this.#boardTwo = new Gameboard();
 
     // For now both use random ship placement
-    this.initializeRandomBoard(this.#boardOne);
-    this.initializeRandomBoard(this.#boardTwo);
+    this.#initializeRandomBoard(this.#boardOne);
+    this.#initializeRandomBoard(this.#boardTwo);
 
     // Player One always starts first, maybe will be random later
     this.#activePlayer = this.#playerOne;
@@ -34,8 +34,16 @@ export class GameController {
     return this.#boardTwo;
   }
 
-  get ActivePlayer() {
+  get activePlayer() {
     return this.#activePlayer;
+  }
+
+  isPlayerOneTurn() {
+    return this.#activePlayer === this.#playerOne;
+  }
+
+  isPlayerTwoTurn() {
+    return this.#activePlayer === this.#playerTwo;
   }
 
   #switchPlayerTurn() {
@@ -85,7 +93,7 @@ export class GameController {
     }
   }
 
-  initializeRandomBoard(board) {
+  #initializeRandomBoard(board) {
     if (!(board instanceof Gameboard)) {
       throw new TypeError("board must be a type of Gameboard");
     }
