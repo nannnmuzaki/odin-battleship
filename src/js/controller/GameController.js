@@ -81,16 +81,16 @@ export class GameController {
 
     // 3. Switch turns
     this.#switchPlayerTurn();
+  }
 
-    // 4. If next active player is a computer, get a computer move and play the play the round
-    if (this.#activePlayer.isPlayerComputer()) {
-      const move = this.#activePlayer.getComputerMove();
+  playComputerTurn() {
+    if (!this.#activePlayer.isPlayerComputer()) return;
 
-      const x = move[0];
-      const y = parseInt(move.slice(1), 10);
+    const move = this.#activePlayer.getComputerMove();
+    const x = move[0];
+    const y = parseInt(move.slice(1), 10);
 
-      this.playRound(x, y);
-    }
+    this.playRound(x, y);
   }
 
   #initializeRandomBoard(board) {

@@ -58,6 +58,14 @@ export class ScreenController {
           cell.addEventListener("click", () => {
             this.#game.playRound(x, y);
             this.updateScreen();
+
+            if (this.#game.activePlayer.isPlayerComputer()) {
+              // Add a 600ms delay to simulate the computer "thinking"
+              setTimeout(() => {
+                this.#game.playComputerTurn();
+                this.updateScreen();
+              }, 600);
+            }
           });
         }
 
