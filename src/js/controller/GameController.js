@@ -46,6 +46,10 @@ export class GameController {
     return this.#activePlayer === this.#playerTwo;
   }
 
+  get isPlayerTwoComputer() {
+    return this.#playerTwo.isPlayerComputer();
+  }
+
   #switchPlayerTurn() {
     this.#activePlayer =
       this.#activePlayer === this.#playerOne
@@ -121,5 +125,9 @@ export class GameController {
         }
       }
     }
+  }
+
+  get winner() {
+    return this.#winner;
   }
 }

@@ -2,32 +2,84 @@ import { GameController } from "./GameController.js";
 
 export class ScreenController {
   #game;
+  #contentDiv;
+  #turnDisplay;
   #playerOneDiv;
   #playerTwoDiv; // currently player two is a computer;
 
   constructor() {
     this.#game = new GameController();
-
-    this.#playerOneDiv = document.querySelector("#player-one-board");
-    this.#playerTwoDiv = document.querySelector("#player-two-board");
-
+    this.#contentDiv = document.querySelector("#content");
+    this.#initializeUI();
     this.updateScreen();
+  }
+
+  #initializeUI() {
+    this.#contentDiv.textContent = "";
+
+    const title = document.createElement("h1");
+    title.textContent = "BATTLESHIP";
+
+    this.#turnDisplay = document.createElement("h2");
+    this.#turnDisplay.id = "turn-display";
+
+    const boardsContainer = document.createElement("div");
+    boardsContainer.classList.add("boards-container");
+
+    const playerOneWrapper = document.createElement("div");
+    const p1Label = document.createElement("h3");
+    p1Label.textContent = "Friendly Fleet";
+    this.#playerOneDiv = document.createElement("div");
+    this.#playerOneDiv.classList.add("board");
+
+    playerOneWrapper.appendChild(p1Label);
+    playerOneWrapper.appendChild(this.#playerOneDiv);
+
+    const playerTwoWrapper = document.createElement("div");
+    const p2Label = document.createElement("h3");
+    p2Label.textContent = "Enemy Waters";
+    this.#playerTwoDiv = document.createElement("div");
+    this.#playerTwoDiv.classList.add("board");
+
+    playerTwoWrapper.appendChild(p2Label);
+    playerTwoWrapper.appendChild(this.#playerTwoDiv);
+
+    boardsContainer.appendChild(playerOneWrapper);
+    boardsContainer.appendChild(playerTwoWrapper);
+
+    this.#contentDiv.appendChild(title);
+    this.#contentDiv.appendChild(this.#turnDisplay);
+    this.#contentDiv.appendChild(boardsContainer);
   }
 
   updateScreen() {
     this.#playerOneDiv.textContent = "";
     this.#playerTwoDiv.textContent = "";
 
-    this.#renderBoard(
-      this.#game.boardOne,
-      this.#playerOneDiv,
-      this.#game.isPlayerOneTurn() ? true : false,
-    );
-    this.#renderBoard(
-      this.#game.boardTwo,
-      this.#playerTwoDiv,
-      this.#game.isPlayerTwoTurn() ? true : false,
-    );
+    const showBoardOne = this.#game.isPlayerOneTurn();
+
+    if (this.#game.winner) {
+      this.#turnDisplay.textContent = `${this.#game.winner.name} Wins!`;
+
+      // Render both boards with showShips = true.
+      // Because showShips is true, !showShips is false, so NO click listeners are attached.
+      // The board is completely locked!
+      this.#renderBoard(this.#game.boardOne, this.#playerOneDiv, true);
+      this.#renderBoard(this.#game.boardTwo, this.#playerTwoDiv, true);
+
+      return;
+    }
+
+    this.#turnDisplay.textContent = this.#game.isPlayerOneTurn()
+      ? "Friendly Fleet's Turn"
+      : "Enemy's Turn";
+
+    const showBoardTwo = this.#game.isPlayerTwoComputer
+      ? false
+      : this.#game.isPlayerTwoTurn();
+
+    this.#renderBoard(this.#game.boardOne, this.#playerOneDiv, showBoardOne);
+    this.#renderBoard(this.#game.boardTwo, this.#playerTwoDiv, showBoardTwo);
   }
 
   #renderBoard(boardData, boardDiv, showShips) {
@@ -64,7 +116,7 @@ export class ScreenController {
               setTimeout(() => {
                 this.#game.playComputerTurn();
                 this.updateScreen();
-              }, 600);
+              }, 1000);
             }
           });
         }

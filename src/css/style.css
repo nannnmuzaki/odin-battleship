@@ -69,3 +69,42 @@ h6 {
 #__next {
   isolation: isolate;
 }
+
+#content > h1 {
+  text-align: center;
+}
+
+#turn-display {
+  text-align: center;
+}
+
+.boards-container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(10, 30px);
+  gap: 2px;
+  background-color: #333;
+  padding: 2px;
+}
+
+.cell {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+.cell.ship {
+  background-color: #666;
+}
+.cell.miss {
+  background-color: #87ceeb;
+}
+.cell.hit {
+  background-color: #ff4136;
+}
