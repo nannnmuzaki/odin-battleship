@@ -108,3 +108,23 @@ h6 {
 .cell.hit {
   background-color: #ff4136;
 }
+
+.cell.preview-valid {
+  background-color: #a8e6cf; /* Soft green */
+  box-shadow: inset 0 0 0 2px #4caf50; /* Inner border to make it look like a cohesive ship */
+  opacity: 0.9;
+}
+
+/* When the ship goes off the edge or overlaps another ship */
+.cell.preview-invalid {
+  background-color: #ff8b94; /* Soft red */
+  box-shadow: inset 0 0 0 2px #f44336;
+  opacity: 0.9;
+  cursor: not-allowed;
+}
+
+/* Ensure placed ships stay dark */
+.cell.ship {
+  background-color: #666;
+  box-shadow: inset 0 0 0 1px #444; /* Give them a slight border too */
+}

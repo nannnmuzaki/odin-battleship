@@ -1,6 +1,7 @@
 export class Player {
   #movePool = [];
   #type = "COMPUTER";
+  #name;
   #allowedType = ["COMPUTER", "PLAYER"];
 
   constructor(type) {
@@ -12,6 +13,9 @@ export class Player {
 
     if (this.#type === "COMPUTER") {
       this.#initializeMovePool();
+      this.#name = "COMPUTER";
+    } else {
+      this.#name = "PLAYER ONE"; // for now it's static
     }
   }
 
@@ -22,6 +26,10 @@ export class Player {
         this.#movePool.push(`${letter}${j}`);
       }
     }
+  }
+
+  get name() {
+    return this.#name;
   }
 
   getComputerMove() {

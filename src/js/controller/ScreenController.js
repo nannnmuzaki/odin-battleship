@@ -6,6 +6,7 @@ export class ScreenController {
   #turnDisplay;
   #playerOneDiv;
   #playerTwoDiv; // currently player two is a computer;
+  #currentOrientation = "HORIZONTAL";
 
   constructor() {
     this.#game = new GameController();
@@ -50,13 +51,41 @@ export class ScreenController {
     this.#contentDiv.appendChild(title);
     this.#contentDiv.appendChild(this.#turnDisplay);
     this.#contentDiv.appendChild(boardsContainer);
+
+    const setupPanel = document.createElement("div");
+    setupPanel.id = "setup-panel";
+    setupPanel.style.marginBottom = "20px"; // Quick spacing
+
+    const rotateBtn = document.createElement("button");
+    rotateBtn.textContent = `Orientation: ${this.#currentOrientation}`;
+    rotateBtn.addEventListener("click", () => {
+      this.#currentOrientation =
+        this.#currentOrientation === "HORIZONTAL" ? "VERTICAL" : "HORIZONTAL";
+      rotateBtn.textContent = `Orientation: ${this.#currentOrientation}`;
+    });
+
+    setupPanel.appendChild(rotateBtn);
+    this.#contentDiv.appendChild(setupPanel); // Append before the boards!
   }
 
   updateScreen() {
     this.#playerOneDiv.textContent = "";
     this.#playerTwoDiv.textContent = "";
 
-    const showBoardOne = this.#game.isPlayerOneTurn();
+    const showBoardOne =
+      this.#game.isPlayerOneTurn() || this.#game.isPlayerTwoComputer()
+        ? true
+        : false;
+
+    const setupPanel = document.getElementById("setup-panel");
+    if (setupPanel) {
+      setupPanel.style.display = this.#game.isSetupPhase() ? "block" : "none";
+    }
+
+    const enemyWrapper = this.#playerTwoDiv.parentElement;
+    if (enemyWrapper) {
+      enemyWrapper.style.display = this.#game.isSetupPhase() ? "none" : "block";
+    }
 
     if (this.#game.winner) {
       this.#turnDisplay.textContent = `${this.#game.winner.name} Wins!`;
@@ -74,7 +103,7 @@ export class ScreenController {
       ? "Friendly Fleet's Turn"
       : "Enemy's Turn";
 
-    const showBoardTwo = this.#game.isPlayerTwoComputer
+    const showBoardTwo = this.#game.isPlayerTwoComputer()
       ? false
       : this.#game.isPlayerTwoTurn();
 
@@ -94,6 +123,90 @@ export class ScreenController {
         cell.dataset.x = x;
         cell.dataset.y = y;
 
+        if (showShips && this.#game.isSetupPhase()) {
+          cell.addEventListener("mouseover", () => {
+            const length = this.#game.currentShipLength();
+            const targetCells = [];
+            let isValid = true;
+
+            // Collect all the cells this ship will occupy
+            for (let i = 0; i < length; i++) {
+              let targetX = x;
+              let targetY = y;
+
+              if (this.#currentOrientation === "HORIZONTAL") {
+                targetX = String.fromCharCode(xCode + i);
+              } else {
+                targetY = y + i;
+              }
+
+              const tCell = boardDiv.querySelector(
+                `[data-x="${targetX}"][data-y="${targetY}"]`,
+              );
+
+              if (tCell) {
+                targetCells.push(tCell);
+                // If the cell already has a ship, it's invalid
+                if (tCell.classList.contains("ship")) {
+                  isValid = false;
+                }
+              } else {
+                // If tCell is null, it means it went off the board!
+                isValid = false;
+              }
+            }
+
+            // Apply the correct visual state to the collected cells
+            targetCells.forEach((tCell) => {
+              if (isValid) {
+                tCell.classList.add("preview-valid");
+              } else {
+                tCell.classList.add("preview-invalid");
+              }
+            });
+          });
+
+          cell.addEventListener("mouseout", () => {
+            // Clear BOTH valid and invalid preview classes
+            const previewCells = boardDiv.querySelectorAll(
+              ".preview-valid, .preview-invalid",
+            );
+            previewCells.forEach((pCell) => {
+              pCell.classList.remove("preview-valid");
+              pCell.classList.remove("preview-invalid");
+            });
+          });
+
+          cell.addEventListener("click", () => {
+            const success = this.#game.placePlayerShip(
+              x,
+              y,
+              this.#currentOrientation,
+            );
+            if (success) {
+              this.updateScreen();
+            }
+          });
+        }
+
+        if (
+          !showShips &&
+          !this.#game.isSetupPhase() &&
+          this.#game.isPlayerOneTurn()
+        ) {
+          cell.addEventListener("click", () => {
+            this.#game.playRound(x, y);
+            this.updateScreen();
+
+            if (this.#game.isPlayerTwoComputer()) {
+              setTimeout(() => {
+                this.#game.playComputerTurn();
+                this.updateScreen();
+              }, 1000);
+            }
+          });
+        }
+
         if (boardData.coordinates.has(coordinate) && showShips) {
           cell.classList.add("ship");
         }
@@ -104,21 +217,6 @@ export class ScreenController {
           } else {
             cell.classList.add("miss");
           }
-        }
-
-        if (!showShips) {
-          cell.addEventListener("click", () => {
-            this.#game.playRound(x, y);
-            this.updateScreen();
-
-            if (this.#game.activePlayer.isPlayerComputer()) {
-              // Add a 600ms delay to simulate the computer "thinking"
-              setTimeout(() => {
-                this.#game.playComputerTurn();
-                this.updateScreen();
-              }, 1000);
-            }
-          });
         }
 
         boardDiv.appendChild(cell);

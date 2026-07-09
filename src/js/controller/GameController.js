@@ -8,6 +8,7 @@ export class GameController {
   #boardTwo;
   #activePlayer;
   #winner;
+  #shipsToPlace;
 
   constructor() {
     this.#playerOne = new Player("PLAYER");
@@ -16,8 +17,8 @@ export class GameController {
     this.#boardOne = new Gameboard();
     this.#boardTwo = new Gameboard();
 
-    // For now both use random ship placement
-    this.#initializeRandomBoard(this.#boardOne);
+    this.#shipsToPlace = [5, 4, 3, 3, 2];
+
     this.#initializeRandomBoard(this.#boardTwo);
 
     // Player One always starts first, maybe will be random later
@@ -34,6 +35,15 @@ export class GameController {
     return this.#boardTwo;
   }
 
+  isSetupPhase() {
+    return this.#shipsToPlace.length > 0;
+  }
+
+  currentShipLength() {
+    // Return the first ship in the queue without removing it yet
+    return this.#shipsToPlace[0];
+  }
+
   get activePlayer() {
     return this.#activePlayer;
   }
@@ -46,8 +56,24 @@ export class GameController {
     return this.#activePlayer === this.#playerTwo;
   }
 
-  get isPlayerTwoComputer() {
+  isPlayerTwoComputer() {
     return this.#playerTwo.isPlayerComputer();
+  }
+
+  placePlayerShip(x, y, orientation) {
+    if (!this.isSetupPhase()) return false;
+
+    const length = this.currentShipLength();
+
+    try {
+      this.#boardOne.placeShip(x, y, orientation, length);
+
+      this.#shipsToPlace.shift();
+      return true;
+    } catch (err) {
+      console.log(err.message);
+      return false;
+    }
   }
 
   #switchPlayerTurn() {
