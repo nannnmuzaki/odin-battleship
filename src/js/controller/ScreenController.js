@@ -54,7 +54,6 @@ export class ScreenController {
 
     const setupPanel = document.createElement("div");
     setupPanel.id = "setup-panel";
-    setupPanel.style.marginBottom = "20px"; // Quick spacing
 
     const rotateBtn = document.createElement("button");
     rotateBtn.textContent = `Orientation: ${this.#currentOrientation}`;
@@ -79,12 +78,12 @@ export class ScreenController {
 
     const setupPanel = document.getElementById("setup-panel");
     if (setupPanel) {
-      setupPanel.style.display = this.#game.isSetupPhase() ? "block" : "none";
+      setupPanel.style.display = this.#game.isSetupPhase() ? "flex" : "none";
     }
 
     const enemyWrapper = this.#playerTwoDiv.parentElement;
     if (enemyWrapper) {
-      enemyWrapper.style.display = this.#game.isSetupPhase() ? "none" : "block";
+      enemyWrapper.style.display = this.#game.isSetupPhase() ? "none" : "flex";
     }
 
     if (this.#game.winner) {

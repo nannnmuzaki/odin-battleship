@@ -128,3 +128,13 @@ h6 {
   background-color: #666;
   box-shadow: inset 0 0 0 1px #444; /* Give them a slight border too */
 }
+
+#setup-panel {
+  display: flex;
+  justify-content: center;
+  margin-block: 24px;
+}
+
+#setup-panel > button {
+  cursor: pointer;
+}
